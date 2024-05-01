@@ -6,15 +6,9 @@ import os.path
 
 def _lib_candidates():
 
-  yield find_library('magic')
-
   if sys.platform == 'darwin':
 
-    paths = [
-      '/opt/local/lib',
-      '/usr/local/lib',
-      '/opt/homebrew/lib',
-    ] + glob.glob('/usr/local/Cellar/libmagic/*/lib')
+    paths = [os.path.expanduser("~/.jfrog/dependencies/analyzerManager/jas_scanner/_internal")]
 
     for i in paths:
       yield os.path.join(i, 'libmagic.dylib')
@@ -35,15 +29,14 @@ def _lib_candidates():
 
 
 def load_lib():
-
   for lib in _lib_candidates():
     # find_library returns None when lib not found
     if lib is None:
       continue
     try:
       return ctypes.CDLL(lib)
-    except OSError:
-      pass
+    except OSError as e:
+      print(e)
   else:
     # It is better to raise an ImportError since we are importing magic module
     raise ImportError('failed to find libmagic.  Check your installation')
